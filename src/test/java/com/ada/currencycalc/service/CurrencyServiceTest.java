@@ -1,10 +1,7 @@
 package com.ada.currencycalc.service;
 
 import com.ada.currencycalc.model.ExchangeRate;
-import com.ada.currencycalc.model.ExchangeRateDTO;
-import com.ada.currencycalc.model.RateDTO;
 import com.ada.currencycalc.repository.ExchangeRateRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +13,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,9 +24,6 @@ import static org.mockito.Mockito.*;
 public class CurrencyServiceTest {
     @Mock
     ExchangeRateRepository exchangeRateRepository;
-
-    @Mock
-    RestTemplate restTemplate;
 
     @Mock
     Clock clock;

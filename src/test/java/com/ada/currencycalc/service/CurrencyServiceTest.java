@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -125,7 +124,7 @@ public class CurrencyServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> currencyService.convertCurrency(from, amount, to));
 
-        assertEquals("Currency code cannot be blank", exception.getMessage());
+        assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
     }
 
     @Test
@@ -137,6 +136,66 @@ public class CurrencyServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> currencyService.convertCurrency(from, amount, to));
 
-        assertEquals("Currency code cannot be blank", exception.getMessage());
+        assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenAmountIsNegative() {
+        String from = "USD";
+        String to = "EUR";
+        double amount = -100;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> currencyService.convertCurrency(from, amount, to));
+
+        assertEquals("Amount cannot be negative", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFromCurrencyIsNull() {
+        String from = null;
+        String to = "EUR";
+        double amount = 100;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> currencyService.convertCurrency(from, amount, to));
+
+        assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenToCurrencyIsNull() {
+        String from = "USD";
+        String to = null;
+        double amount = 100;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> currencyService.convertCurrency(from, amount, to));
+
+        assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFromCurrencyIsBlank() {
+        String from = "   ";
+        String to = "EUR";
+        double amount = 100;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> currencyService.convertCurrency(from, amount, to));
+
+        assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenToCurrencyIsBlank() {
+        String from = "USD";
+        String to = "   ";
+        double amount = 100;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> currencyService.convertCurrency(from, amount, to));
+
+        assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
     }
 }

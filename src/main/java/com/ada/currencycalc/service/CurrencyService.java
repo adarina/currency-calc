@@ -11,6 +11,8 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Slf4j
 @Service
 public class CurrencyService {
@@ -27,8 +29,11 @@ public class CurrencyService {
     }
 
     public double convertCurrency(String from, double amount, String to) {
-        if (from.isBlank() || to.isBlank()) {
-            throw new IllegalArgumentException("Currency code cannot be blank");
+        if (isBlank(from) || isBlank(to)) {
+            throw new IllegalArgumentException("Currency code cannot be blank, empty or null");
+        }
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount cannot be negative");
         }
         double fromRate = getExchangeRate(from);
         double toRate = getExchangeRate(to);

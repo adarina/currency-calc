@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/currency-conversion")
 public class CurrencyController {
 
     private final CurrencyService currencyService;
@@ -16,8 +18,8 @@ public class CurrencyController {
         this.currencyService = currencyService;
     }
 
-    @GetMapping("/convert")
-    public double convertCurrency(@RequestParam String from, @RequestParam double amount, @RequestParam String to) {
+    @GetMapping
+    public BigDecimal convertCurrency(@RequestParam String from, @RequestParam BigDecimal amount, @RequestParam String to) {
         return currencyService.convertCurrency(from, amount, to);
     }
 }

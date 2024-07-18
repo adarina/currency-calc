@@ -6,7 +6,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <changeSet id="1" author="Ada">
+    <changeSet id="create-table" author="Ada">
         <createTable tableName="exchange_rate">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -14,7 +14,7 @@
             <column name="currency_code" type="VARCHAR(3)">
                 <constraints nullable="false"/>
             </column>
-            <column name="rate" type="DOUBLE">
+            <column name="rate" type="NUMERIC(38,2)">
                 <constraints nullable="false"/>
             </column>
             <column name="effective_date" type="DATE">

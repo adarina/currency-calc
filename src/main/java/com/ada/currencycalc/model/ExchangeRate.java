@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -21,10 +22,10 @@ public class ExchangeRate {
     private Long id;
 
     private String currencyCode;
-    private double rate;
+    private BigDecimal rate;
     private LocalDate effectiveDate;
 
-    public ExchangeRate(String currencyCode, double rate, LocalDate effectiveDate) {
+    public ExchangeRate(String currencyCode, BigDecimal rate, LocalDate effectiveDate) {
         this.currencyCode = currencyCode;
         this.rate = rate;
         this.effectiveDate = effectiveDate;

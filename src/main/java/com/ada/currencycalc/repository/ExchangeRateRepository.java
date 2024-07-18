@@ -8,4 +8,7 @@ import java.util.Optional;
 
 public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long> {
     Optional<ExchangeRate> findByCurrencyCodeAndEffectiveDate(String currencyCode, LocalDate effectiveDate);
+
+    void deleteByEffectiveDate(LocalDate effectiveDate);
+
 }

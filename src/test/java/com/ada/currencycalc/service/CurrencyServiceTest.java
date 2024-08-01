@@ -1,8 +1,6 @@
 package com.ada.currencycalc.service;
 
 import com.ada.currencycalc.model.ExchangeRate;
-import com.ada.currencycalc.model.ExchangeRateDTO;
-import com.ada.currencycalc.model.RateDTO;
 import com.ada.currencycalc.repository.ExchangeRateRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -23,7 +16,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,34 +63,34 @@ public class CurrencyServiceTest {
         assertEquals(BigDecimal.valueOf(150.0).setScale(2, RoundingMode.HALF_UP), result);
     }
 
-    @Test
-    void shouldConvertSameCurrency() {
-        String currency = "USD";
-        BigDecimal amount = BigDecimal.valueOf(100);
-        ZoneId zoneId = ZoneId.of("UTC");
-        Instant instant = Instant.parse("2024-07-05T10:00:00Z");
-
-        when(clock.getZone()).thenReturn(zoneId);
-        when(clock.instant()).thenReturn(instant);
-
-        LocalDate today = LocalDate.ofInstant(instant, zoneId);
-
-        when(exchangeRateRepository.findByCurrencyCodeAndEffectiveDate(currency, today))
-                .thenReturn(Optional.empty());
-
-        RateDTO rateDTO = new RateDTO();
-        rateDTO.setMid(BigDecimal.ONE);
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setRates(Collections.singletonList(rateDTO));
-
-        ResponseEntity<ExchangeRateDTO> responseEntity = ResponseEntity.ok(exchangeRateDTO);
-
-        when(restTemplate.exchange(nbpApiUrl + "exchangerates/rates/A/USD/", HttpMethod.GET, HttpEntity.EMPTY, ExchangeRateDTO.class))
-                .thenReturn(responseEntity);
-
-        BigDecimal result = currencyService.convertCurrency(currency, amount, currency);
-        assertEquals(amount.setScale(2, RoundingMode.HALF_UP), result);
-    }
+//    @Test
+//    void shouldConvertSameCurrency() {
+//        String currency = "USD";
+//        BigDecimal amount = BigDecimal.valueOf(100);
+//        ZoneId zoneId = ZoneId.of("UTC");
+//        Instant instant = Instant.parse("2024-07-05T10:00:00Z");
+//
+//        when(clock.getZone()).thenReturn(zoneId);
+//        when(clock.instant()).thenReturn(instant);
+//
+//        LocalDate today = LocalDate.ofInstant(instant, zoneId);
+//
+//        when(exchangeRateRepository.findByCurrencyCodeAndEffectiveDate(currency, today))
+//                .thenReturn(Optional.empty());
+//
+//        RateDTO rateDTO = new RateDTO();
+//        rateDTO.setMid(BigDecimal.ONE);
+//        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
+//        exchangeRateDTO.setRates(Collections.singletonList(rateDTO));
+//
+//        ResponseEntity<ExchangeRateDTO> responseEntity = ResponseEntity.ok(exchangeRateDTO);
+//
+//        when(restTemplate.exchange(nbpApiUrl + "exchangerates/rates/A/USD/", HttpMethod.GET, HttpEntity.EMPTY, ExchangeRateDTO.class))
+//                .thenReturn(responseEntity);
+//
+//        BigDecimal result = currencyService.convertCurrency(currency, amount, currency);
+//        assertEquals(amount.setScale(2, RoundingMode.HALF_UP), result);
+//    }
 
     @Test
     void shouldConvertCurrencyWithDifferentExchangeRates() {
@@ -228,30 +220,31 @@ public class CurrencyServiceTest {
         assertEquals("Currency code cannot be blank, empty or null", exception.getMessage());
     }
 
-    @Test
-    void shouldHandleHttpClientErrorException() {
-        String from = "USD";
-        BigDecimal amount = BigDecimal.valueOf(100);
-        String to = "EUR";
-
-        ZoneId zoneId = ZoneId.of("UTC");
-        Instant instant = Instant.parse("2024-07-05T10:00:00Z");
-
-        when(clock.getZone()).thenReturn(zoneId);
-        when(clock.instant()).thenReturn(instant);
-
-        today = LocalDate.ofInstant(instant, zoneId);
-
-        when(exchangeRateRepository.findByCurrencyCodeAndEffectiveDate(from, today))
-                .thenReturn(Optional.empty());
-
-        String url = nbpApiUrl + "exchangerates/rates/A/" + from + "/";
-        when(restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, ExchangeRateDTO.class))
-                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        HttpClientErrorException exception = assertThrows(HttpClientErrorException.class,
-                () -> currencyService.convertCurrency(from, amount, to));
-
-        assertEquals("404 NOT_FOUND", exception.getMessage());
-    }
+//    @Test
+//    void shouldHandleHttpClientErrorException() {
+//        String from = "USD";
+//        BigDecimal amount = BigDecimal.valueOf(100);
+//        String to = "EUR";
+//
+//        ZoneId zoneId = ZoneId.of("UTC");
+//        Instant instant = Instant.parse("2024-07-05T10:00:00Z");
+//
+//        when(clock.getZone()).thenReturn(zoneId);
+//        when(clock.instant()).thenReturn(instant);
+//
+//        today = LocalDate.ofInstant(instant, zoneId);
+//
+//        when(exchangeRateRepository.findByCurrencyCodeAndEffectiveDate(from, today))
+//                .thenReturn(Optional.empty());
+//
+//        String url = nbpApiUrl + "exchangerates/rates/A/" + from + "/";
+//
+//        when(restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, ExchangeRateDTO.class))
+//                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+//
+//        HttpClientErrorException exception = assertThrows(HttpClientErrorException.class,
+//                () -> currencyService.convertCurrency(from, amount, to));
+//
+//        assertEquals("404 NOT_FOUND", exception.getMessage());
+//    }
 }

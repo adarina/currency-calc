@@ -1,6 +1,7 @@
 package com.ada.currencycalc.service;
 
 import com.ada.currencycalc.repository.ExchangeRateRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class CleanupService {
     }
 
     @Scheduled(cron = "0 0 1 * * ?")
+    @Transactional
     public void clearPreviousDayData() {
         LocalDate yesterday = LocalDate.now(clock).minusDays(1);
         log.info("Starting cleanup for date: {}", yesterday.format(DateTimeFormatter.ISO_DATE));

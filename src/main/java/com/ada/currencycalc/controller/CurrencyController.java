@@ -1,5 +1,6 @@
 package com.ada.currencycalc.controller;
 
+import com.ada.currencycalc.model.CurrencyConversionResult;
 import com.ada.currencycalc.service.CurrencyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +20,9 @@ public class CurrencyController {
     }
 
     @GetMapping
-    public BigDecimal convertCurrency(@RequestParam String from, @RequestParam BigDecimal amount, @RequestParam String to) {
-        return currencyService.convertCurrency(from, amount, to);
+    public CurrencyConversionResult convertCurrency(@RequestParam String from, @RequestParam BigDecimal amount, @RequestParam String to) {
+        BigDecimal result = currencyService.convertCurrency(from, amount, to);
+        return new CurrencyConversionResult(from, to, amount, result);
     }
 }
 

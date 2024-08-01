@@ -26,17 +26,14 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class CurrencyService {
 
     private final ExchangeRateRepository exchangeRateRepository;
-    private final RestTemplate restTemplate;
+    private final NbpApiConnector nbpApiConnector;
 
     private final Clock clock;
 
-    @Value("${nbp.api.url}")
-    private String nbpApiUrl;
-
-    public CurrencyService(ExchangeRateRepository exchangeRateRepository, Clock clock, RestTemplate restTemplate) {
+    public CurrencyService(ExchangeRateRepository exchangeRateRepository, Clock clock, NbpApiConnector nbpApiConnector) {
         this.exchangeRateRepository = exchangeRateRepository;
-        this.restTemplate = restTemplate;
         this.clock = clock;
+        this.nbpApiConnector = nbpApiConnector;
     }
 
     public BigDecimal convertCurrency(String from, BigDecimal amount, String to) {
@@ -65,36 +62,12 @@ public class CurrencyService {
             return optionalExchangeRate.get().getRate();
         } else {
             log.info("Exchange rate not found in database, fetching from external API");
-            BigDecimal newRate = fetchAndSaveExchangeRate(currencyCode);
+            BigDecimal newRate = nbpApiConnector.fetchAndSaveExchangeRate(currencyCode);
             log.info("Added new exchange rate to database: currencyCode={}, date={}, rate={}", currencyCode, today, newRate);
             return newRate;
         }
     }
 
-    private boolean isValidExchangeRateDTO(ExchangeRateDTO exchangeRateDTO) {
-        return exchangeRateDTO != null && exchangeRateDTO.getRates() != null && !exchangeRateDTO.getRates().isEmpty();
-    }
 
-    BigDecimal fetchAndSaveExchangeRate(String currencyCode) {
-        String url = String.format(nbpApiUrl + "exchangerates/rates/A/%s/", currencyCode);
-        ResponseEntity<ExchangeRateDTO> response;
-        try {
-            response = restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, ExchangeRateDTO.class);
-        } catch (HttpClientErrorException.NotFound ex) {
-            log.error("Error fetching exchange rate from external API: {}", ex.getMessage());
-            throw new ExternalApiException(ex.getMessage());
-
-        }
-        ExchangeRateDTO exchangeRateDTO = response.getBody();
-        if (!isValidExchangeRateDTO(exchangeRateDTO)) {
-            String errorMessage = "Unable to fetch exchange rate for currency: " + currencyCode;
-            log.error(errorMessage);
-            throw new RuntimeException(errorMessage);
-        }
-        BigDecimal rate = exchangeRateDTO.getRates().get(0).getMid();
-        ExchangeRate exchangeRate = new ExchangeRate(currencyCode, rate, LocalDate.now(clock));
-        exchangeRateRepository.save(exchangeRate);
-        return rate;
-    }
 }
 
